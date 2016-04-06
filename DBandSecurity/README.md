@@ -4,9 +4,9 @@ repo
 A Symfony project created on April 4, 2016, 1:45 am.
 
 available routes:
-  /hello/{name}
-  /task
+  /admin/create
   
-  /login
-  /register
+users info:
+  user: admin pw: kitten
+  user: ryan  pw: ryanpass
   
