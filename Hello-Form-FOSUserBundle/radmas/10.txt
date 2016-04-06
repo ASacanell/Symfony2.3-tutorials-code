@@ -1,0 +1,115 @@
+10.- Aplicando las buenas prácticas de programación de Symfony2, inclusión del bundle FOSUserBundle (procedimiento de instalación, configuración y ejemplo de utilización).	
+	
+	Instalación y configuración:
+	
+		Descargar el bundle con composer.
+		
+			composer require friendsofsymfony/user-bundle "~2.0@dev"
+			
+		Registrar  el bundle en el fichero app/AppKernel.php
+		
+			// app/AppKernel.php
+				$bundles = array(
+					//..
+					new FOS\UserBundle\FOSUserBundle(),
+					//..
+				);
+			
+		Dado que el bundle maneja usuarios, necesitaremos una entidad usuarios.
+		
+			// src/AppBundle/Entity/User.php
+				<?php
+				namespace AppBundle\Entity;
+		
+				use FOS\UserBundle\Model\User as BaseUser;
+				use Doctrine\ORM\Mapping as ORM;
+		
+				/**
+				 * @ORM\Entity
+				 * @ORM\Table(name="fos_user")
+				 */
+				class User extends BaseUser
+				{
+					/**
+					 * @ORM\Id
+					 * @ORM\Column(type="integer")
+					 * @ORM\GeneratedValue(strategy="AUTO")
+					 */
+					protected $id;
+		
+					public function __construct()
+					{
+						parent::__construct();
+						// your own logic
+					}
+				}
+				
+		Ahora tenemos que configurar las opciones de seguridad para que utilice el bundle.
+		
+			//app/config/security.yml
+			security:
+
+			   encoders:
+				   FOS\UserBundle\Model\UserInterface: bcrypt
+			
+			   role_hierarchy:
+				   ROLE_ADMIN:    ROLE_USER
+				   ROLE_SUPER_ADMIN: ROLE_ADMIN
+			
+			   providers:
+				   fos_userbundle:
+					   id: fos_user.user_provider.username
+			
+			   firewalls:
+				   main:
+					   pattern: ^/
+					   form_login:
+						   provider: fos_userbundle
+						   csrf_provider: form.csrf_provider
+					   logout:    true
+					   anonymous:    true
+			
+			   access_control:
+				   - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+				   - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
+				   - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
+				   - { path: ^/admin/, role: ROLE_ADMIN }		
+			
+		Ahora configuraremos el bundle para que cumpla nuestras necesidades.
+			
+			#app/config/config.yml
+			#...
+			fos_user:
+				db_driver: orm
+				firewall_name: main
+				user_class: AppBundle\Entity\User
+			#...
+		
+		A continuación, importamos el enrutamiento de los ficheros del bundle
+		
+			# app/config/routing.yml
+			#...
+			fos_user:
+				resource: "@FOSUserBundle/Resources/config/routing/all.xml"
+			#...
+			
+		Por último, actualizamos el esquema de la base de datos si la entidad usuario es nueva:
+		
+			$ php bin/console doctrine:schema:update --force
+			
+		Con esto ya tendremos el bundle instalado y configurado.
+	
+	Ejemplo de uso:
+	
+		A partir de ahora, podremos meternos en /register y estará creado automáticamente un formulario de registro.
+		Del mismo modo, tenemos el /login para logearnos.
+		
+		Tambien nos permite el logear, en vez de por username, por email.
+		Para ello habría que cambiar la configuración de la siguiente forma:
+		
+			# app/config/security.yml
+			security:
+				providers:
+					fos_userbundle:
+						id: fos_user.user_provider.username_email
+			

@@ -1,0 +1,5 @@
+2.- Si quieres descartar momentáneamente unos cambios y recuperarlos posteriormente, ¿qué comando usarías?
+
+	En ese caso utilizaría el comando git stash para poder trabajar mientras los cambios estan almacenados en una pila.
+	Para ver el contenido almacenado en dicha pila utilizaría git stash list.
+	Para volver a trabajar posteriormente con dichos cambios, bastaría con el comando git stash pop.

@@ -1,0 +1,628 @@
+Alejandro Sacanell
+
+
+Symfony
+Las siguientes preguntas van relacionadas con la versión 2.3 de Symfony.
+
+1.- Con tus propias palabras describe cuáles crees que son las ventajas de utilizar un framework.
+
+	Utilizar un framework nos permite utilizar funciones ya testeadas que nos permiten realizar diferentes acciones de una manera mas sencilla, que de otra forma tendríamos que implementar nosotros mismos, simplificando la tarea de programar a la ver que mejorando el código final.
+
+2.- Con tus propias palabras describe las características fundamentales de los siguientes conceptos:
+	Patrón de diseño Observer
+
+		El patrón observer se basa en crear objetos "observers" que están conectados a otros. Al producirse algún cambio en estos otros, notifican a todos sus observadores relacionados, de forma que estos realizan la actualización que esté definida. 
+		De esta forma conseguimos una manejo de eventos distribuido.
+			
+		Esencial para el MVC.
+
+	Patrón de diseño Singleton
+		
+		Es un patrón que nos limita el número de instanciaciones de una clase a un máximo de uno, proporcionando un único punto de acceso a ella.
+		
+	Patrón de diseño Abstract Factory
+		
+		Proporciona una interfaz para crear familias de objetos relacionados o que dependen entre sí, sin especificar sus clases concretas.
+		Como ventajas, permite de dicha forma manejar las clases a través de dicha interfaz, y facilita la consistencia entre los diferentes productos.
+			
+	Patrón de diseño MVC
+		
+		Consiste en la diferenciación en tres partes del software, conectadas entre ellas.
+		El modelo, la vista y el controlador.
+		Siguiendo este modelo, una posible interacción sería así:
+			El usuario, realizaría una acción pulsando un botón (perteneciente a la vista)
+			Este botón, activaría un observador que notificaría al controlador la acción.
+			El controlador gestiona dicha acción, y actualiza el modelo.
+			Por último el modelo, que ha sido actualizado, provoca que la vista se actualice con los nuevos datos.
+			El usuario recibiría la nueva vista.
+				
+		Utilizando este patrón se consiguen varias ventajas esenciales para proyectos, como por ejemplo un mantenimiento del código mucho más simple, o que tambien permite una mejor escalabilidad, o la permisividad de varias vistas para un mismo modelo.
+
+3.- Enumera las tecnologías/frameworks con los que has trabajado en proyectos personales, y explica en qué consiste cada una de una forma general. Incluye, si procede, una referencia a algún proyecto personal que tengas (página web, enlace a repositorio, etc).
+
+	Wordpress: (http://www.)
+		
+	jQuery: (http://www.hckur.com/pruebas -- En construcción)
+		
+	
+4.- Aplicando las buenas prácticas de programación de Symfony2, cómo recogerías los parámetros pasados por POST de la siguiente API, si tuvieras que programar la lógica del controlador que lo atiende en el lado del servidor:
+https://www.flickr.com/services/api/flickr.galleries.addPhoto.html
+		
+	/*Api_Controller*/
+	<?php
+
+	namespace ASN\APIBundle\Api_Controller;
+
+	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+	use Symfony\Component\HttpFoundation\Request;
+	
+	class Api_Controller extends Controller
+	{
+		public function indexAction(Request $request)
+		{
+			
+			//Getting the POST values
+			$key = $request->request->get('api_key');
+			$gallery = $request->request->get('gallery_id');
+			$photo = $request->request->get('photo_id');
+			$comment = $request->request->get('comment', '');
+			
+			//Code to check if its working
+			return new Response('<html><body>
+								API_key: '.$key.'
+								Gallery_id: '.$gallery.'
+								Photo_id: '.$photo.'
+								Comment: '.$comment.
+								'!</body></html>');
+		}
+	}
+
+5.- Aplicando las buenas prácticas de programación de Symfony2, construir un formulario que recoja los datos de registro de un usuario (construir controlador y página que muestre el formulario).
+
+	He realizado el formulario de manera que recoge una entidad, Name, que contiene nombre, apellido, contraseña y que incluye otra entidad, Address, que contiene una calle y un número.
+	
+	Las entidades quedarían así:
+	
+	
+	// src/Acme/TaskBundle/Entity/Name.php
+	<?php
+	namespace Acme\TaskBundle\Entity;
+
+	use Symfony\Component\Validator\Constraints as Assert;
+	 
+	class Name
+	{
+		//	First Name
+
+		protected $name;
+	 
+
+		//	Last Name
+
+		protected $lastName;
+		 
+		/**
+		 * @Assert\Type(type="Acme\TaskBundle\Entity\Address")
+		 */
+		protected $address;
+		
+		protected $password;
+		
+		
+		public function getName()
+		{
+			return $this->name;
+		}
+		public function setName($name)
+		{
+			$this->name = $name;
+		}
+	 
+		public function getLastName()
+		{
+			return $this->lastName;
+		}
+	 
+		public function setLastName($lastName)
+		{
+			$this->lastName = $lastName;
+		}
+		
+			public function getAddress()
+		{
+			return $this->address;
+		}
+	 
+		public function setAddress(Address $address = null)
+		{
+			$this->address = $address;
+		}
+		
+		
+		public function getPassword()
+		{
+			return $this->password;
+		}
+		public function setPassword($password)
+		{
+			$this->password = $password;
+		}
+	}
+	
+	// src/Acme/TaskBundle/Entity/Address.php
+	<?php
+
+	
+	namespace Acme\TaskBundle\Entity;
+
+	use Symfony\Component\Validator\Constraints as Assert;
+	 
+	class Address
+	{
+		/**
+		 * @Assert\NotBlank()
+		 */
+		protected $street;
+		
+		/**
+		 * @Assert\NotBlank()
+		 */
+		protected $number;
+
+	 
+		public function getNumber()
+		{
+			return $this->number;
+		}
+		public function setNumber($number)
+		{
+			$this->number = $number;
+		}
+		
+		public function getStreet()
+		{
+			return $this->street;
+		}
+		public function setStreet($street)
+		{
+			$this->street = $street;
+		}
+	 
+	}
+	
+	
+	El controlador:
+	
+	<?php
+
+	namespace Acme\TaskBundle\Controller;
+
+	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+	use Acme\TaskBundle\Entity\Name;
+	use Symfony\Component\HttpFoundation\Request;
+	use Acme\TaskBundle\Form\Type\NameType;
+
+
+	class DefaultController extends Controller
+	{
+		public function newAction(Request $request)
+		{
+			// Creating the new user info
+			$name= new Name();
+			
+			
+			$form = $this->createForm(new NameType(), $name);
+				
+			$form->handleRequest($request);
+			
+			
+			if ($form->isValid()) {
+				//Following code is just to check that we have received the form inputs correctly.
+				$firstName = $form["name"]->getData();
+				$lastName = $form["lastName"]->getData();
+				$street = $form["address"]["street"]->getData();
+				$number = $form["address"]["number"]->getData();
+				
+				return $this->render('AcmeTaskBundle:Default:response.html.twig', array(
+							'firstName' => $firstName, 'lastName' => $lastName, 'street' => $street, 'number' => $number,
+						));	
+			}else{
+			return $this->render('AcmeTaskBundle:Default:new.html.twig', array(
+						'form' => $form->createView(),
+					));
+			}
+		}
+	}
+	
+	Además, creo las clases de formulario siguientes para sacarlas del controlador:
+	
+	// src/Acme/TaskBundle/Form/Type/NameType.php
+	
+	<?php 
+		
+	namespace Acme\TaskBundle\Form\Type;
+	 
+	use Symfony\Component\Form\AbstractType;
+	use Symfony\Component\Form\FormBuilderInterface;
+	use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+	 
+	class NameType extends AbstractType
+	{
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+			$builder
+				->add('name')
+				->add('lastName')
+				->add('address', new AddressType())
+				->add('password', 'password');
+			}
+	 
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+			$resolver->setDefaults(array(
+				'data_class' => 'Acme\TaskBundle\Entity\Name',
+				'cascade_validation' => true,
+			));
+		}
+	 
+		public function getName()
+		{
+			return 'name';
+		}
+	}
+	
+
+	
+	// src/Acme/TaskBundle/Form/Type/AddressType.php
+	
+	<?php 
+
+	namespace Acme\TaskBundle\Form\Type;
+	 
+	use Symfony\Component\Form\AbstractType;
+	use Symfony\Component\Form\FormBuilderInterface;
+	use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+	 
+	 
+	class AddressType extends AbstractType
+	{
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+			$builder
+				->add('street')
+				->add('number');
+		}
+	 
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+			$resolver->setDefaults(array(
+				'data_class' => 'Acme\TaskBundle\Entity\Address',
+			));
+		}
+		
+		public function getName()
+		{
+			return 'street';
+		}
+	}
+	
+	
+	Este controlador, para mostrar el formulario y comprobar que ha recibido bien los inputs, utiliza dos plantillas twig:
+	
+	{# src/Acme/TaskBundle/Resources/views/Default/new.html.twig #}
+
+	<html>
+		<head>
+		
+			{% block stylesheets %}
+				<link href="{{ asset('Acme/task/css/estilo.css') }}" type="text/css" rel="stylesheet" />
+			{% endblock %}
+		
+		</head>
+		
+		<body>
+			{{ form_start(form) }}
+				{{ form_errors(form) }}
+				
+				<h3>Info</h3>
+			 
+				{{ form_row(form.name) }}
+				{{ form_row(form.lastName) }}
+				
+				<h3>Address</h3>
+				
+				{{ form_row(form.address.street) }}
+				{{ form_row(form.address.number) }}
+				
+				</br>
+				
+				{{ form_row(form.password) }}
+			 
+				</br>
+			 
+				{{ form_rest(form) }}
+			 
+				<input type="submit" />
+			{{ form_end(form) }}
+		</body>
+
+	</html>
+
+	
+	
+	{# src/Acme/TaskBundle/Resources/views/Default/response.html.twig #}
+
+	<html>
+		<head>
+		
+		
+		</head>
+		
+		<body>
+
+				
+				<h2>Inputs</h2>
+				<h4>Name</h4>
+					{{ firstName }} {{ lastName }}
+				
+				<h4>Address</h4>
+					{{ street }} {{ number }}
+				
+
+			 
+				</br>
+
+		</body>
+
+	</html>
+
+	Por último, el formulario está definido como servicio, y para ello he tenido que modificar el fichero de servicios:
+	
+	# src/Acme/TaskBundle/Resources/config/services.yml
+	services:
+		acme_task.form.type.name:
+			class: Acme\TaskBundle\Form\Type\NameType
+			tags:
+				- { name: form.type, alias: name }
+	
+	
+	
+	
+
+6.- Aplicando las buenas prácticas de programación de Symfony2, construir las directivas de seguridad para crear un área pública y otra privada.
+	/*
+		
+	*/
+	
+
+7.- Aplicando las buenas prácticas de programación de Symfony2, cómo establecerías la relación entre las entidades autor y cómic usando Doctrine ORM:
+http://developer.marvel.com/docs#!/public/getComicsCollection_get_14
+
+	Es una relación many-to-many.
+	Con el propósito de mostrar como relacionar cómics y creadores, voy a simplificar los atributos de dichas entidades.
+	Utilizaré simplemente un id(key) y un nombre para cada entidad.
+	Las entidades quedarían así:
+		
+		// src/AppBundle/Entity/creator.php
+		
+		<?php
+		namespace AppBundle\Entity;
+    
+		use Doctrine\ORM\Mapping as ORM;
+    
+		/**
+		 * @ORM\Entity
+		 * @ORM\Table(name="creator")
+		 */
+		class creator
+		{
+			// ...
+			/**
+			 * @ORM\Id
+			 * @ORM\Column(type="integer")
+			 * @ORM\GeneratedValue(strategy="AUTO")
+			 */
+			protected $id;
+			
+			/**
+			* @ORM\Column(type="text")
+			*/
+			protected $creator_name;
+			
+			/**
+			* @ORM\ManyToMany(targetEntity="comic", mappedBy="creators")
+			* @ORM\JoinTable(name="creators_comics")
+			*/
+			private $comics;
+    
+			public function __construct() {
+				$this->comics = new \Doctrine\Common\Collections\ArrayCollection();
+			}
+    
+			// ...
+		}
+		
+		
+		// src/AppBundle/Entity/comic.php
+		
+		<?php
+		namespace AppBundle\Entity;
+    
+		use Doctrine\ORM\Mapping as ORM;
+    
+		/**
+		 * @ORM\Entity
+		 * @ORM\Table(name="comic")
+		 */
+		class comic
+		{
+			// ...
+    
+			/**
+			 * @ORM\Id
+			 * @ORM\Column(type="integer")
+			 * @ORM\GeneratedValue(strategy="AUTO")
+			 */
+			protected $id;
+			
+			/**
+			 * @ORM\Column(type="text")
+			 */
+			protected $comic_name;
+			
+			/**
+			 * @ORM\ManyToMany(targetEntity="creator", inversedBy="comics")
+			 */
+			private $creators;
+    
+			public function __construct() {
+				$this->creators = new \Doctrine\Common\Collections\ArrayCollection();
+			}
+    
+			// ...
+		}
+	
+	Con dichos atributos ORM, se configura una nueva tabla que relaciona los id's de creadores y cómics, estableciendo así la relación. Pudiendo de esta forma, hallar todos los datos de los cómics que tienen como creador uno dado.
+	
+8.- Aplicando las buenas prácticas de programación de Symfony2, implementar un Repositorio Personalizado, realizando una consulta a base de datos personalizada (en lenguaje DQL).
+
+	
+
+9.- Aplicando las buenas prácticas de programación de Symfony2, crear un Listener que se ejecute cuando el Kernel de Symfony lance el evento Request, para manipular la petición. Dicho Listener debe tener inyectado el ORM.
+
+	
+
+10.- Aplicando las buenas prácticas de programación de Symfony2, inclusión del bundle FOSUserBundle (procedimiento de instalación, configuración y ejemplo de utilización).	
+	
+	Instalación y configuración:
+	
+		Descargar el bundle con composer.
+		
+			composer require friendsofsymfony/user-bundle "~2.0@dev"
+			
+		Registrar  el bundle en el fichero app/AppKernel.php
+		
+			// app/AppKernel.php
+				$bundles = array(
+					//..
+					new FOS\UserBundle\FOSUserBundle(),
+					//..
+				);
+			
+		Dado que el bundle maneja usuarios, necesitaremos una entidad usuarios.
+		
+			// src/AppBundle/Entity/User.php
+				<?php
+				namespace AppBundle\Entity;
+		
+				use FOS\UserBundle\Model\User as BaseUser;
+				use Doctrine\ORM\Mapping as ORM;
+		
+				/**
+				 * @ORM\Entity
+				 * @ORM\Table(name="fos_user")
+				 */
+				class User extends BaseUser
+				{
+					/**
+					 * @ORM\Id
+					 * @ORM\Column(type="integer")
+					 * @ORM\GeneratedValue(strategy="AUTO")
+					 */
+					protected $id;
+		
+					public function __construct()
+					{
+						parent::__construct();
+						// your own logic
+					}
+				}
+				
+		Ahora tenemos que configurar las opciones de seguridad para que utilice el bundle.
+		
+			//app/config/security.yml
+			security:
+
+			   encoders:
+				   FOS\UserBundle\Model\UserInterface: bcrypt
+			
+			   role_hierarchy:
+				   ROLE_ADMIN:    ROLE_USER
+				   ROLE_SUPER_ADMIN: ROLE_ADMIN
+			
+			   providers:
+				   fos_userbundle:
+					   id: fos_user.user_provider.username
+			
+			   firewalls:
+				   main:
+					   pattern: ^/
+					   form_login:
+						   provider: fos_userbundle
+						   csrf_provider: form.csrf_provider
+					   logout:    true
+					   anonymous:    true
+			
+			   access_control:
+				   - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
+				   - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
+				   - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
+				   - { path: ^/admin/, role: ROLE_ADMIN }		
+			
+		Ahora configuraremos el bundle para que cumpla nuestras necesidades.
+			
+			#app/config/config.yml
+			#...
+			fos_user:
+				db_driver: orm
+				firewall_name: main
+				user_class: AppBundle\Entity\User
+			#...
+		
+		A continuación, importamos el enrutamiento de los ficheros del bundle
+		
+			# app/config/routing.yml
+			#...
+			fos_user:
+				resource: "@FOSUserBundle/Resources/config/routing/all.xml"
+			#...
+			
+		Por último, actualizamos el esquema de la base de datos si la entidad usuario es nueva:
+		
+			$ php bin/console doctrine:schema:update --force
+			
+		Con esto ya tendremos el bundle instalado y configurado.
+	
+	Ejemplo de uso:
+	
+		A partir de ahora, podremos meternos en /register y estará creado automáticamente un formulario de registro.
+		Del mismo modo, tenemos el /login para logearnos.
+		
+		Tambien nos permite el logear, en vez de por username, por email.
+		Para ello habría que cambiar la configuración de la siguiente forma:
+		
+			# app/config/security.yml
+			security:
+				providers:
+					fos_userbundle:
+						id: fos_user.user_provider.username_email
+			
+Git
+
+1.- Comando para agregar un cambio a un commit existente (el último).
+
+	Usaríamos el comando git commit --amend.
+
+2.- Si quieres descartar momentáneamente unos cambios y recuperarlos posteriormente, ¿qué comando usarías?
+
+	En ese caso utilizaría el comando git stash para poder trabajar mientras los cambios estan almacenados en una pila.
+	Para ver el contenido almacenado en dicha pila utilizaría git stash list.
+	Para volver a trabajar posteriormente con dichos cambios, bastaría con el comando git stash pop.
+
+3.- Has estado trabajando en tu rama de git, y al traer el trabajo de un compañero te das cuenta que se han generado conflictos. ¿Cómo los resolverías?
+
+	Tendría que, o bien manualmente o bien con la ayuda de "mergetools", solucionar dichos conflictos.
+
+
+

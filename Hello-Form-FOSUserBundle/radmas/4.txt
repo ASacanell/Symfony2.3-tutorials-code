@@ -1,0 +1,31 @@
+4.- Aplicando las buenas prácticas de programación de Symfony2, cómo recogerías los parámetros pasados por POST de la siguiente API, si tuvieras que programar la lógica del controlador que lo atiende en el lado del servidor:
+https://www.flickr.com/services/api/flickr.galleries.addPhoto.html
+		
+	/*Api_Controller*/
+	<?php
+
+	namespace ASN\APIBundle\Api_Controller;
+
+	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+	use Symfony\Component\HttpFoundation\Request;
+	
+	class Api_Controller extends Controller
+	{
+		public function indexAction(Request $request)
+		{
+			
+			//Getting the POST values
+			$key = $request->request->get('api_key');
+			$gallery = $request->request->get('gallery_id');
+			$photo = $request->request->get('photo_id');
+			$comment = $request->request->get('comment', '');
+			
+			//Code to check if its working
+			return new Response('<html><body>
+								API_key: '.$key.'
+								Gallery_id: '.$gallery.'
+								Photo_id: '.$photo.'
+								Comment: '.$comment.
+								'!</body></html>');
+		}
+	}

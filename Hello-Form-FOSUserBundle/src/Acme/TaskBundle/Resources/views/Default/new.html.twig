@@ -1,0 +1,38 @@
+{# src/Acme/TaskBundle/Resources/views/Default/new.html.twig #}
+
+<html>
+	<head>
+	
+		{% block stylesheets %}
+			<link href="{{ asset('Acme/task/css/estilo.css') }}" type="text/css" rel="stylesheet" />
+		{% endblock %}
+	
+	</head>
+	
+	<body>
+		{{ form_start(form) }}
+			{{ form_errors(form) }}
+			
+			<h3>Info</h3>
+		 
+			{{ form_row(form.name) }}
+			{{ form_row(form.lastName) }}
+			
+			<h3>Address</h3>
+			
+			{{ form_row(form.address.street) }}
+			{{ form_row(form.address.number) }}
+			
+			</br>
+			
+			{{ form_row(form.password) }}
+		 
+			</br>
+		 
+			{{ form_rest(form) }}
+		 
+			<input type="submit" />
+		{{ form_end(form) }}
+	</body>
+
+</html>

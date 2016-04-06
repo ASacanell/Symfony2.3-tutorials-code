@@ -1,0 +1,4 @@
+1.- Con tus propias palabras describe cuáles crees que son las ventajas de utilizar un framework.
+
+	Utilizar un framework nos permite utilizar funciones ya testeadas que nos permiten realizar diferentes acciones de una manera mas sencilla, que de otra forma tendríamos que implementar nosotros mismos, simplificando la tarea de programar a la ver que mejorando el código final.
+

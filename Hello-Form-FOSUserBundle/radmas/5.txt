@@ -1,0 +1,308 @@
+5.- Aplicando las buenas prácticas de programación de Symfony2, construir un formulario que recoja los datos de registro de un usuario (construir controlador y página que muestre el formulario).
+
+	He realizado el formulario de manera que recoge una entidad, Name, que contiene nombre, apellido, contraseña y que incluye otra entidad, Address, que contiene una calle y un número.
+	
+	Las entidades quedarían así:
+	
+	
+	// src/Acme/TaskBundle/Entity/Name.php
+	<?php
+	namespace Acme\TaskBundle\Entity;
+
+	use Symfony\Component\Validator\Constraints as Assert;
+	 
+	class Name
+	{
+		//	First Name
+
+		protected $name;
+	 
+
+		//	Last Name
+
+		protected $lastName;
+		 
+		/**
+		 * @Assert\Type(type="Acme\TaskBundle\Entity\Address")
+		 */
+		protected $address;
+		
+		protected $password;
+		
+		
+		public function getName()
+		{
+			return $this->name;
+		}
+		public function setName($name)
+		{
+			$this->name = $name;
+		}
+	 
+		public function getLastName()
+		{
+			return $this->lastName;
+		}
+	 
+		public function setLastName($lastName)
+		{
+			$this->lastName = $lastName;
+		}
+		
+			public function getAddress()
+		{
+			return $this->address;
+		}
+	 
+		public function setAddress(Address $address = null)
+		{
+			$this->address = $address;
+		}
+		
+		
+		public function getPassword()
+		{
+			return $this->password;
+		}
+		public function setPassword($password)
+		{
+			$this->password = $password;
+		}
+	}
+	
+	// src/Acme/TaskBundle/Entity/Address.php
+	<?php
+
+	
+	namespace Acme\TaskBundle\Entity;
+
+	use Symfony\Component\Validator\Constraints as Assert;
+	 
+	class Address
+	{
+		/**
+		 * @Assert\NotBlank()
+		 */
+		protected $street;
+		
+		/**
+		 * @Assert\NotBlank()
+		 */
+		protected $number;
+
+	 
+		public function getNumber()
+		{
+			return $this->number;
+		}
+		public function setNumber($number)
+		{
+			$this->number = $number;
+		}
+		
+		public function getStreet()
+		{
+			return $this->street;
+		}
+		public function setStreet($street)
+		{
+			$this->street = $street;
+		}
+	 
+	}
+	
+	
+	El controlador:
+	
+	<?php
+
+	namespace Acme\TaskBundle\Controller;
+
+	use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+	use Acme\TaskBundle\Entity\Name;
+	use Symfony\Component\HttpFoundation\Request;
+	use Acme\TaskBundle\Form\Type\NameType;
+
+
+	class DefaultController extends Controller
+	{
+		public function newAction(Request $request)
+		{
+			// Creating the new user info
+			$name= new Name();
+			
+			
+			$form = $this->createForm(new NameType(), $name);
+				
+			$form->handleRequest($request);
+			
+			
+			if ($form->isValid()) {
+				//Following code is just to check that we have received the form inputs correctly.
+				$firstName = $form["name"]->getData();
+				$lastName = $form["lastName"]->getData();
+				$street = $form["address"]["street"]->getData();
+				$number = $form["address"]["number"]->getData();
+				
+				return $this->render('AcmeTaskBundle:Default:response.html.twig', array(
+							'firstName' => $firstName, 'lastName' => $lastName, 'street' => $street, 'number' => $number,
+						));	
+			}else{
+			return $this->render('AcmeTaskBundle:Default:new.html.twig', array(
+						'form' => $form->createView(),
+					));
+			}
+		}
+	}
+	
+	Además, creo las clases de formulario siguientes para sacarlas del controlador:
+	
+	// src/Acme/TaskBundle/Form/Type/NameType.php
+	
+	<?php 
+		
+	namespace Acme\TaskBundle\Form\Type;
+	 
+	use Symfony\Component\Form\AbstractType;
+	use Symfony\Component\Form\FormBuilderInterface;
+	use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+	 
+	class NameType extends AbstractType
+	{
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+			$builder
+				->add('name')
+				->add('lastName')
+				->add('address', new AddressType())
+				->add('password', 'password');
+			}
+	 
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+			$resolver->setDefaults(array(
+				'data_class' => 'Acme\TaskBundle\Entity\Name',
+				'cascade_validation' => true,
+			));
+		}
+	 
+		public function getName()
+		{
+			return 'name';
+		}
+	}
+	
+
+	
+	// src/Acme/TaskBundle/Form/Type/AddressType.php
+	
+	<?php 
+
+	namespace Acme\TaskBundle\Form\Type;
+	 
+	use Symfony\Component\Form\AbstractType;
+	use Symfony\Component\Form\FormBuilderInterface;
+	use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+	 
+	 
+	class AddressType extends AbstractType
+	{
+		public function buildForm(FormBuilderInterface $builder, array $options)
+		{
+			$builder
+				->add('street')
+				->add('number');
+		}
+	 
+		public function setDefaultOptions(OptionsResolverInterface $resolver)
+		{
+			$resolver->setDefaults(array(
+				'data_class' => 'Acme\TaskBundle\Entity\Address',
+			));
+		}
+		
+		public function getName()
+		{
+			return 'street';
+		}
+	}
+	
+	
+	Este controlador, para mostrar el formulario y comprobar que ha recibido bien los inputs, utiliza dos plantillas twig:
+	
+	{# src/Acme/TaskBundle/Resources/views/Default/new.html.twig #}
+
+	<html>
+		<head>
+		
+			{% block stylesheets %}
+				<link href="{{ asset('Acme/task/css/estilo.css') }}" type="text/css" rel="stylesheet" />
+			{% endblock %}
+		
+		</head>
+		
+		<body>
+			{{ form_start(form) }}
+				{{ form_errors(form) }}
+				
+				<h3>Info</h3>
+			 
+				{{ form_row(form.name) }}
+				{{ form_row(form.lastName) }}
+				
+				<h3>Address</h3>
+				
+				{{ form_row(form.address.street) }}
+				{{ form_row(form.address.number) }}
+				
+				</br>
+				
+				{{ form_row(form.password) }}
+			 
+				</br>
+			 
+				{{ form_rest(form) }}
+			 
+				<input type="submit" />
+			{{ form_end(form) }}
+		</body>
+
+	</html>
+
+	
+	
+	{# src/Acme/TaskBundle/Resources/views/Default/response.html.twig #}
+
+	<html>
+		<head>
+		
+		
+		</head>
+		
+		<body>
+
+				
+				<h2>Inputs</h2>
+				<h4>Name</h4>
+					{{ firstName }} {{ lastName }}
+				
+				<h4>Address</h4>
+					{{ street }} {{ number }}
+				
+
+			 
+				</br>
+
+		</body>
+
+	</html>
+
+	Por último, el formulario está definido como servicio, y para ello he tenido que modificar el fichero de servicios:
+	
+	# src/Acme/TaskBundle/Resources/config/services.yml
+	services:
+		acme_task.form.type.name:
+			class: Acme\TaskBundle\Form\Type\NameType
+			tags:
+				- { name: form.type, alias: name }

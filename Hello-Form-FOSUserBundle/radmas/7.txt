@@ -1,0 +1,88 @@
+7.- Aplicando las buenas prácticas de programación de Symfony2, cómo establecerías la relación entre las entidades autor y cómic usando Doctrine ORM:
+http://developer.marvel.com/docs#!/public/getComicsCollection_get_14
+
+	Es una relación many-to-many.
+	Con el propósito de mostrar como relacionar cómics y creadores, voy a simplificar los atributos de dichas entidades.
+	Utilizaré simplemente un id(key) y un nombre para cada entidad.
+	Las entidades quedarían así:
+		
+		// src/AppBundle/Entity/creator.php
+		
+		<?php
+		namespace AppBundle\Entity;
+    
+		use Doctrine\ORM\Mapping as ORM;
+    
+		/**
+		 * @ORM\Entity
+		 * @ORM\Table(name="creator")
+		 */
+		class creator
+		{
+			// ...
+			/**
+			 * @ORM\Id
+			 * @ORM\Column(type="integer")
+			 * @ORM\GeneratedValue(strategy="AUTO")
+			 */
+			protected $id;
+			
+			/**
+			* @ORM\Column(type="text")
+			*/
+			protected $creator_name;
+			
+			/**
+			* @ORM\ManyToMany(targetEntity="comic", mappedBy="creators")
+			* @ORM\JoinTable(name="creators_comics")
+			*/
+			private $comics;
+    
+			public function __construct() {
+				$this->comics = new \Doctrine\Common\Collections\ArrayCollection();
+			}
+    
+			// ...
+		}
+		
+		
+		// src/AppBundle/Entity/comic.php
+		
+		<?php
+		namespace AppBundle\Entity;
+    
+		use Doctrine\ORM\Mapping as ORM;
+    
+		/**
+		 * @ORM\Entity
+		 * @ORM\Table(name="comic")
+		 */
+		class comic
+		{
+			// ...
+    
+			/**
+			 * @ORM\Id
+			 * @ORM\Column(type="integer")
+			 * @ORM\GeneratedValue(strategy="AUTO")
+			 */
+			protected $id;
+			
+			/**
+			 * @ORM\Column(type="text")
+			 */
+			protected $comic_name;
+			
+			/**
+			 * @ORM\ManyToMany(targetEntity="creator", inversedBy="comics")
+			 */
+			private $creators;
+    
+			public function __construct() {
+				$this->creators = new \Doctrine\Common\Collections\ArrayCollection();
+			}
+    
+			// ...
+		}
+	
+	Con dichos atributos ORM, se configura una nueva tabla que relaciona los id's de creadores y cómics, estableciendo así la relación. Pudiendo de esta forma, hallar todos los datos de los cómics que tienen como creador uno dado.

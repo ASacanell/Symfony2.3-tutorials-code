@@ -1,0 +1,29 @@
+2.- Con tus propias palabras describe las características fundamentales de los siguientes conceptos:
+	Patrón de diseño Observer
+
+		El patrón observer se basa en crear objetos "observers" que están conectados a otros. Al producirse algún cambio en estos otros, notifican a todos sus observadores relacionados, de forma que estos realizan la actualización que esté definida. 
+		De esta forma conseguimos una manejo de eventos distribuido.
+			
+		Esencial para el MVC.
+
+	Patrón de diseño Singleton
+		
+		Es un patrón que nos limita el número de instanciaciones de una clase a un máximo de uno, proporcionando un único punto de acceso a ella.
+		
+	Patrón de diseño Abstract Factory
+		
+		Proporciona una interfaz para crear familias de objetos relacionados o que dependen entre sí, sin especificar sus clases concretas.
+		Como ventajas, permite de dicha forma manejar las clases a través de dicha interfaz, y facilita la consistencia entre los diferentes productos.
+			
+	Patrón de diseño MVC
+		
+		Consiste en la diferenciación en tres partes del software, conectadas entre ellas.
+		El modelo, la vista y el controlador.
+		Siguiendo este modelo, una posible interacción sería así:
+			El usuario, realizaría una acción pulsando un botón (perteneciente a la vista)
+			Este botón, activaría un observador que notificaría al controlador la acción.
+			El controlador gestiona dicha acción, y actualiza el modelo.
+			Por último el modelo, que ha sido actualizado, provoca que la vista se actualice con los nuevos datos.
+			El usuario recibiría la nueva vista.
+				
+		Utilizando este patrón se consiguen varias ventajas esenciales para proyectos, como por ejemplo un mantenimiento del código mucho más simple, o que tambien permite una mejor escalabilidad, o la permisividad de varias vistas para un mismo modelo.

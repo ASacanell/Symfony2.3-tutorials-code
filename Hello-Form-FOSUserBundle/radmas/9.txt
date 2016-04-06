@@ -1,0 +1,27 @@
+9. Crear un Listener que se ejecute cuando el Kernel de Symfony lance el evento Request, para manipular la petición. Dicho Listener debe tener inyectado el ORM.
+
+	Creamos el listener:
+	
+		// src/AppBundle/EventListener/RequestListener.php
+		namespace AppBundle\EventListener;
+
+		use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+		use Symfony\Component\HttpFoundation\Response;
+
+		class RequestListener
+		{
+			public function onKernelRequest(GetResponseEvent $event)
+			{
+				$request   = $event->getRequest();
+			}
+		}
+	
+	Y lo registramos como servicio:
+	
+		# app/config/services.yml
+		services:
+			app.request_listener:
+				class: AppBundle\EventListener\RequestListener
+				tags:
+					- { name: kernel.event_listener, event: kernel.request }
+	

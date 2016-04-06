@@ -1,0 +1,5 @@
+services:
+    acme_task.form.type.name:
+        class: Acme\TaskBundle\Form\Type\NameType
+        tags:
+            - { name: form.type, alias: name }

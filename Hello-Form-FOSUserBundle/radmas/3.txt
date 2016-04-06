@@ -1,0 +1,5 @@
+3.- Enumera las tecnologías/frameworks con los que has trabajado en proyectos personales, y explica en qué consiste cada una de una forma general. Incluye, si procede, una referencia a algún proyecto personal que tengas (página web, enlace a repositorio, etc).
+
+	Wordpress(http://www.perrosdebusqueda.es/ -- http://www.iecico.com/):
+	
+		Es un gestor de contenido (CMS) que permite la creación de páginas web de forma sencilla y muy personalizable a través de plantillas y plugins.
